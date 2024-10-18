@@ -402,27 +402,30 @@ export class Api {
      * @param referer referer to use
      */
     setUserAgent(userAgent: string, referer?: string): void {
-        if (userAgent === undefined || userAgent === null || userAgent === '') {
-            userAgent = this.defaultUserAgent;
-        }
-
-        // Remove trailing slash from referer if it exists
-        let originURL: string;
-        if (referer?.endsWith('/')) {
-        originURL= referer.slice(0, -1);
-        }
-
-        session.defaultSession.webRequest.onBeforeSendHeaders(
-            (details, callback) => {
-                details.requestHeaders['User-Agent'] = userAgent;
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-                details.requestHeaders['Referer'] = referer as string;
-                details.requestHeaders['Origin'] = originURL as string;
-                callback({ requestHeaders: details.requestHeaders });
-            }
-        );
-        console.log(`Success: Set "${userAgent}" as user agent header`);
+    if (!userAgent) {
+        userAgent = this.defaultUserAgent;
     }
+
+    // Determine the origin URL based on the referer
+    let originURL: string | undefined;
+    if (referer) {
+        originURL = referer.endsWith('/') ? referer.slice(0, -1) : referer;
+    }
+
+    session.defaultSession.webRequest.onBeforeSendHeaders(
+        (details, callback) => {
+            details.requestHeaders['User-Agent'] = userAgent;
+            if (referer) {
+                details.requestHeaders['Referer'] = referer;
+            }
+            if (originURL) {
+                details.requestHeaders['Origin'] = originURL;
+            }
+            callback({ requestHeaders: details.requestHeaders });
+        }
+    );
+    console.log(`Success: Set "${userAgent}" as user agent header`);
+}
 
     /**
      * Sets epg browser window
