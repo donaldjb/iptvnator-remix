@@ -116,7 +116,7 @@ try {
     // Added 400 ms to fix the black background issue while using transparent window. More details at https://github.com/electron/electron/issues/15947
     app.on('ready', () => {
         // create main window and set menu
-        const win = createWindow();
+        win = createWindow();
         const menu = new AppMenu(win);
         Menu.setApplicationMenu(menu.getMenu());
         api.setMainWindow(win);
