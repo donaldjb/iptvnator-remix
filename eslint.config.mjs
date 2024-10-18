@@ -20,7 +20,7 @@ const compat = new FlatCompat({
 
 export default [
     {
-        ignores: ['**/*.worker.ts'],
+        //ignores: ['**/*.worker.ts'],
     },
     {
         languageOptions: {
