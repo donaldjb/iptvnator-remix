@@ -402,30 +402,30 @@ export class Api {
      * @param referer referer to use
      */
     setUserAgent(userAgent: string, referer?: string): void {
-    if (!userAgent) {
-        userAgent = this.defaultUserAgent;
-    }
-
-    // Determine the origin URL based on the referer
-    let originURL: string | undefined;
-    if (referer) {
-        originURL = referer.endsWith('/') ? referer.slice(0, -1) : referer;
-    }
-
-    session.defaultSession.webRequest.onBeforeSendHeaders(
-        (details, callback) => {
-            details.requestHeaders['User-Agent'] = userAgent;
-            if (referer) {
-                details.requestHeaders['Referer'] = referer;
-            }
-            if (originURL) {
-                details.requestHeaders['Origin'] = originURL;
-            }
-            callback({ requestHeaders: details.requestHeaders });
+        if (!userAgent) {
+            userAgent = this.defaultUserAgent;
         }
-    );
-    console.log(`Success: Set "${userAgent}" as user agent header`);
-}
+
+        // Determine the origin URL based on the referer
+        let originURL: string | undefined;
+        if (referer) {
+            originURL = referer.endsWith('/') ? referer.slice(0, -1) : referer;
+        }
+
+        session.defaultSession.webRequest.onBeforeSendHeaders(
+            (details, callback) => {
+                details.requestHeaders['User-Agent'] = userAgent;
+                if (referer) {
+                    details.requestHeaders['Referer'] = referer;
+                }
+                if (originURL) {
+                    details.requestHeaders['Origin'] = originURL;
+                }
+                callback({ requestHeaders: details.requestHeaders });
+            }
+        );
+        console.log(`Success: Set "${userAgent}" as user agent header`);
+    }
 
     /**
      * Sets epg browser window
@@ -532,11 +532,10 @@ export class Api {
         event?: Electron.IpcMainEvent
     ) {
         if (!args.filePath) return;
-        let refreshedPlaylist: Playlist;
 
         try {
             const playlist = await fsPromises.readFile(args.filePath, 'utf-8');
-            refreshedPlaylist = this.getRefreshedPlaylist(args, playlist);
+            const refreshedPlaylist = this.getRefreshedPlaylist(args, playlist);
 
             if (event) {
                 this.sendPlaylistRefreshResponse(
@@ -548,7 +547,12 @@ export class Api {
                 return refreshedPlaylist;
             }
         } catch (err) {
-            return;
+            if (event) {
+                event.sender.send(ERROR, {
+                    message: `Failed to read the playlist file: ${err.message}`,
+                    status: err.code || 'UNKNOWN_ERROR',
+                });
+            }
         }
     }
 
