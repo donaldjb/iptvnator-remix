@@ -88,11 +88,15 @@ test.afterAll(async () => {
 function deleteDbFile() {
     const pathToFile = './e2e/db/data.db';
 
-    try {
-        fs.unlink(pathToFile, () => {
+    fs.unlink(pathToFile, (err) => {
+        if (err) {
+            if (err.code === 'ENOENT') {
+                console.log("File doesn't exist, won't remove it.");
+            } else {
+                console.error('Error occurred while trying to remove file', err);
+            }
+        } else {
             console.log('db file was deleted');
-        });
-    } catch (error) {
-        console.log('db file not found');
-    }
+        }
+    });
 }
