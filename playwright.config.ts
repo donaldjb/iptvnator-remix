@@ -13,7 +13,7 @@ const config: PlaywrightTestConfig = {
                 serviceWorkers: 'block',
             },
         },
-        /* {
+        {
             name: 'firefox',
             use: {
                 ...devices['Desktop Firefox'],
@@ -26,7 +26,7 @@ const config: PlaywrightTestConfig = {
                 ...devices['Desktop Safari'],
                 serviceWorkers: 'block',
             },
-        }, */
+        },
     ],
     use: {
         headless: false,
