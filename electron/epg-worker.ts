@@ -51,7 +51,12 @@ const fetchEpgDataFromUrl = (epgUrl: string) => {
                 if (epgUrl.endsWith('.gz')) {
                     console.log(loggerLabel, 'start unzipping...');
                     zlib.gunzip(data, (_err, output) => {
-                        parseAndSetEpg(output);
+                        if (_err) {
+                            console.error(loggerLabel, 'Error unzipping EPG data:', _err);
+                            ipcRenderer.send(EPG_ERROR);
+                        } else {
+                            parseAndSetEpg(output);
+                        }
                     });
                 } else {
                     parseAndSetEpg(data);
