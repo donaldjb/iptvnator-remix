@@ -26,7 +26,7 @@ export class FilterPipe implements PipeTransform {
         const normalizedFilter = normalizeFilterValue(filter);
         
         return array.filter((item) =>
-            item[property].toLowerCase().includes(filter.toLowerCase())
+            normalizeFilterValue(item?.[property]).includes(normalizedFilter)
         );
     }
 }
