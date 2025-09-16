@@ -27,17 +27,11 @@
             <ng-template #videoPlayer>
                 <!-- video.js player -->
                 <app-vjs-player
-                    *ngIf="playerSettings.player === 'videojs'"
-                    [options]="{
-                        sources: [
-                            {
-                                src:
-                                    activeChannel?.url +
-                                    activeChannel?.epgParams,
-                                type: 'application/x-mpegURL',
-                            },
-                        ],
-                    }"
+                    *ngIf="
+                        playerSettings.player === 'videojs' &&
+                        vjsOptions as options
+                    "
+                    [options]="options"
                     [class.hide-captions]="!playerSettings.showCaptions"
                 ></app-vjs-player>
 
