@@ -66,8 +66,19 @@ export class VjsPlayerComponent implements OnInit, OnChanges, OnDestroy {
      * @param changes contains changed channel object
      */
     ngOnChanges(changes: SimpleChanges): void {
-        if (changes.options.previousValue) {
-            this.player.src(changes.options.currentValue.sources[0]);
+        if (changes.options.previousValue && this.player) {
+            const sources = changes.options.currentValue?.sources ?? [];
+            const nextSource = sources[0];
+            const nextSourceUrl = nextSource?.src;
+            const currentSourceUrl =
+                this.player.currentSource()?.src ?? this.lastSourceUrl;
+
+            if (nextSourceUrl && nextSourceUrl !== currentSourceUrl) {
+                this.player.src(nextSource);
+                const updatedSourceUrl =
+                    this.player.currentSource()?.src ?? nextSourceUrl;
+                this.lastSourceUrl = updatedSourceUrl;
+            }
         }
     }
 
