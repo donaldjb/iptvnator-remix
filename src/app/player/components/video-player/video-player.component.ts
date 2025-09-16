@@ -49,7 +49,10 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
     /** Active selected channel */
     activeChannel$ = this.store
         .select(selectActive)
-        .pipe(filter((channel) => Boolean(channel?.url)));
+        .pipe(
+            filter((channel) => Boolean(channel?.url)),
+            tap((channel) => this.setVjsOptions(channel))
+        );
 
     /** Channels list */
     channels$!: Observable<Channel[]>;
