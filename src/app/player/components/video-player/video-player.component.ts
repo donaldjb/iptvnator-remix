@@ -165,6 +165,29 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         );
     }
 
+    private setVjsOptions(channel: Channel | null | undefined): void {
+        if (!channel?.url) {
+            this.vjsOptions = undefined;
+            return;
+        }
+
+        const sourceUrl = channel.url + (channel.epgParams ?? '');
+        const currentUrl = this.vjsOptions?.sources?.[0]?.src;
+
+        if (currentUrl === sourceUrl) {
+            return;
+        }
+
+        this.vjsOptions = {
+            sources: [
+                {
+                    src: sourceUrl,
+                    type: 'application/x-mpegURL',
+                },
+            ],
+        };
+    }
+    
     /**
      * Opens a playlist provided as a url param
      * e.g. iptvnat.or?url=http://...
