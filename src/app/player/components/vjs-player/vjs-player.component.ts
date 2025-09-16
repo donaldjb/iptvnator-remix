@@ -52,6 +52,13 @@ export class VjsPlayerComponent implements OnInit, OnChanges, OnDestroy {
             displayCurrentQuality: true,
         });
         this.player['aspectRatioPanel']();
+
+        const initialSource =
+            this.player.currentSource()?.src ??
+            this.options?.sources?.[0]?.src;
+        if (initialSource) {
+            this.lastSourceUrl = initialSource;
+        }
     }
 
     /**
