@@ -66,6 +66,9 @@ export class VideoPlayerComponent implements OnInit, OnDestroy {
         showCaptions: false,
     };
 
+    /** Video.js options for the current channel */
+    vjsOptions?: videoJs.PlayerOptions;
+    
     /** IPC Renderer commands list with callbacks */
     commandsList = [
         {
