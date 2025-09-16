@@ -147,7 +147,17 @@ export class PlaylistsService {
                 DbStores.Playlists,
                 portalId
             )
-            .pipe(map((item) => item.favorites.filter(itm => itm && itm.stream_type && itm.stream_type !== 'live') ?? []));
+            .pipe(
+                map(
+                    (item) =>
+                        item?.favorites?.filter(
+                            (itm) =>
+                                itm &&
+                                itm.stream_type &&
+                                itm.stream_type !== 'live'
+                        ) ?? []
+                )
+            );
     }
 
     getPortalLiveStreamFavorites(portalId: string) {
@@ -156,7 +166,17 @@ export class PlaylistsService {
                 DbStores.Playlists,
                 portalId
             )
-            .pipe(map((item) => item.favorites.filter(itm => itm && itm.stream_type && itm.stream_type === 'live') ?? []));
+            .pipe(
+                map(
+                    (item) =>
+                        item?.favorites?.filter(
+                            (itm) =>
+                                itm &&
+                                itm.stream_type &&
+                                itm.stream_type === 'live'
+                        ) ?? []
+                )
+            );
     }
 
     addPortalFavorite(portalId: string, item: any) {
@@ -175,7 +195,7 @@ export class PlaylistsService {
             switchMap((portal) =>
                 this.dbService.update(DbStores.Playlists, {
                     ...portal,
-                    favorites: portal.favorites.filter(
+                    favorites: (portal.favorites ?? []).filter(
                         (i) =>
                             (i as Partial<XtreamItem>).stream_id !==
                                 favoriteId &&
