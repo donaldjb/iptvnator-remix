@@ -31,6 +31,8 @@ export class VjsPlayerComponent implements OnInit, OnChanges, OnDestroy {
     @Input() options: videoJs.PlayerOptions;
     /** VideoJs object */
     player: videoJs.Player;
+    /** Last source url loaded into the player */
+    private lastSourceUrl?: string;
 
     /**
      * Instantiate Video.js on component init
