@@ -12,7 +12,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { StorageMap } from '@ngx-pwa/local-storage';
-import { Observable, combineLatestWith, filter, map, switchMap } from 'rxjs';
+import { Observable, combineLatestWith, filter, map, switchMap, tap } from 'rxjs';
+import type videoJs from 'video.js';
 import { Channel } from '../../../../../shared/channel.interface';
 import {
     CHANNEL_SET_USER_AGENT,
