@@ -21,6 +21,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Store } from '@ngrx/store';
 import { IpcCommand } from '../../../shared/ipc-command.class';
 import {
+    REMOTE_CONTROL_CHANGE_CHANNEL,
     ERROR,
     OPEN_MPV_PLAYER,
     OPEN_VLC_PLAYER,
@@ -102,7 +103,8 @@ type LayoutView =
     | 'player'
     | 'serie-details'
     | 'favorites'
-    | 'error-view';
+    | 'error-view'
+    | 'live-stream-favorites';
 
 @Component({
     selector: 'app-xtream-main-container',
@@ -167,6 +169,7 @@ export class XtreamMainContainerComponent implements OnInit {
 
     player: VideoPlayer;
     favorites$: Observable<any>;
+    favoritesLiveStream$: Observable<any>;
     breadcrumbs: Breadcrumb[] = [];
     items = [];
     listeners = [];
@@ -183,6 +186,7 @@ export class XtreamMainContainerComponent implements OnInit {
     streamUrl: string;
     epgItems = [];
     hideExternalInfoDialog = this.portalStore.hideExternalInfoDialog;
+    activeLiveStream: XtreamLiveStream;
 
     commandsList = [
         new IpcCommand(XTREAM_RESPONSE, (response: XtreamResponse) =>
@@ -191,6 +195,9 @@ export class XtreamMainContainerComponent implements OnInit {
         new IpcCommand(ERROR, (response: { message: string; status: number }) =>
             this.showErrorAsNotification(response)
         ),
+        new IpcCommand(REMOTE_CONTROL_CHANGE_CHANNEL, (response: { type: 'up' | 'down' }) => {
+            this.remoteControlChangeChannel(response.type);
+        })
     ];
 
     constructor() {
@@ -198,6 +205,9 @@ export class XtreamMainContainerComponent implements OnInit {
             if (this.currentPlaylist()) {
                 this.getCategories(this.selectedContentType);
                 this.favorites$ = this.playlistService.getPortalFavorites(
+                    this.currentPlaylist()._id
+                );
+                this.favoritesLiveStream$ = this.playlistService.getPortalLiveStreamFavorites(
                     this.currentPlaylist()._id
                 );
             }
@@ -332,6 +342,7 @@ export class XtreamMainContainerComponent implements OnInit {
                 stream_id: item.stream_id,
                 limit: 10,
             });
+            this.activeLiveStream = item;
             this.playLiveStream(item);
         } else if (item.series_id) {
             this.items = [];
@@ -345,6 +356,7 @@ export class XtreamMainContainerComponent implements OnInit {
     playLiveStream(item: XtreamLiveStream) {
         const { serverUrl, username, password } = this.currentPlaylist();
         const streamUrl = `${serverUrl}/${item.stream_type}/${username}/${password}/${item.stream_id}.m3u8`;
+        this.activeLiveStream = item;
         this.openPlayer(streamUrl, item.name);
     }
 
@@ -527,7 +539,29 @@ export class XtreamMainContainerComponent implements OnInit {
     }
 
     favoritesClicked() {
-        this.currentLayout = 'favorites';
+        if (this.selectedContentType === ContentType.ITV) {
+            this.currentLayout = 'live-stream-favorites';
+        } else {
+            this.currentLayout = 'favorites';
+        }
         this.setInitialBreadcrumb();
+    }
+
+    remoteControlChangeChannel(type: 'up' | 'down') {
+        if (this.currentLayout === 'category_content' && this.activeLiveStream) {
+            let nextItem;
+            const index = this.activeLiveStream.num - 1;
+            if (type === 'up') {
+                if (index - 1 >= 0) {
+                    nextItem = this.items[index - 1];
+                }
+            } else if (type === 'down') {
+                const index = this.activeLiveStream.num - 1;
+                if (index + 1 < this.items.length) {
+                    nextItem = this.items[index + 1];
+                }
+            }
+            this.itemClicked(nextItem);
+        }
     }
 }

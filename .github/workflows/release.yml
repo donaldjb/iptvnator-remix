@@ -1,8 +1,8 @@
 name: Release
 on:
-  create:
-    tags:
-      - v*
+  push:
+    branches:
+      - electron
   workflow_dispatch:
 jobs:
   package:
@@ -24,7 +24,7 @@ jobs:
           node-version: '18'
 
       - name: Install Snapcraft
-        uses: samuelmeuli/action-snapcraft@v2
+        uses: samuelmeuli/action-snapcraft@v3
         # Only install Snapcraft on Ubuntu
         if: startsWith(matrix.os, 'ubuntu')
         with:
